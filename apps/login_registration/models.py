@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import bcrypt
 import re
-import datetime
 
 from django.db import models
 

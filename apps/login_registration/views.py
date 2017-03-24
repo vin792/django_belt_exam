@@ -1,23 +1,16 @@
 from django.shortcuts import render, redirect, reverse
 import bcrypt
 from . models import User, UserManager
-from django.contrib import messages
-from datetime import datetime 
+from django.contrib import messages 
 
 def index(request):
-	
-	print User.objects.all()
-
 	if 'user_id' in request.session:
 		request.session.pop('user_id')
-
 	return render(request, 'login_registration/index.html')
 
 def register(request):
 	if request.method == "POST":
-
 		register_outcome = User.objects.register(request.POST['name'],request.POST['username'],request.POST['password'],request.POST['password_confirm'],request.POST['date_hired'])
-
 		if isinstance(register_outcome, tuple):
 			request.session['user_id'] = register_outcome[1]
 			return redirect(reverse('dashboard:index')) 
