@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<title>My Wish List</title>
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row" id="header">
+				<div class="col-sm-6" id="page_head">
+					<h2>Welcome, {{ user.name.title }}</h2>
+				</div>
+				<div class="col-sm-3 col-sm-offset-3" id="actions">
+					<br>
+					<div class="btn-group">
+  						<a href="{% url 'wish_items:create' %}" class="btn btn-link">Add New Item</a>
+  						<a href="{% url 'login:index' %}" class="btn btn-link">Logout</a>
+					</div>
+				</div>
+			</div>
+			<div class="row" id="user_wishlist">
+				<div class="col-sm-8">
+					<table class="table table-striped">
+						<h4>Your Wish List:</h4>
+						<tr>
+							<th>Item</th>
+							<th>Added by</th>
+							<th>Date Added</th>
+							<th>Action</th>
+						</tr>
+						{% for item in user_wishlist %}
+						<tr>
+							<td><a href="{% url 'wish_items:display_item' item.id %}">{{ item.name.title }}</a></td>
+							<td>{{ item.user.name.title }}</td>
+							<td>{{ item.created_at }}</td>
+							{% if item.user.id == user.id %}
+								<td><form action="{% url 'wish_items:destroy_item' item.id %}" method="post">{% csrf_token %}<button type="submit" class="btn btn-danger">Delete</button></form></td>
+							{% else %}
+								<td><form action="{% url 'wish_items:remove_from_wishlist' item.id %}" method="post">{% csrf_token %}<button type="submit" class="btn btn-info">Remove from my wish list</button></form></td>
+							{% endif %}
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="row" id="user_not_in_wishlist">
+				<div class="col-sm-8">
+					<table class="table table-striped">
+						<h4>Other Users' Wish List</h4>
+						<tr>
+							<th>Item</th>
+							<th>Added by</th>
+							<th>Date Added</th>
+							<th>Action</th>
+						</tr>
+						{% for item in items_not_in_wishlist %}
+						<tr>
+							<td><a href="{% url 'wish_items:display_item' item.id %}">{{ item.name.title }}</a></td>
+							<td>{{ item.user.name.title }}</td>
+							<td>{{ item.created_at }}</td>
+							<td><form action="{% url 'wish_items:add_to_wishlist' item.id %}" method="post">{% csrf_token %}<button type = "submit" class = "btn btn-primary">Add to my Wishlist</button></form></td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

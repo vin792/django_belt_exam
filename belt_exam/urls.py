@@ -17,5 +17,7 @@ from django.conf.urls import url, include
 # from django.contrib import admin
 
 urlpatterns = [
-    url(r'^', include('apps.login_registration.urls', namespace = 'login')),
+    url(r'^main/', include('apps.login_registration.urls', namespace = 'login')),
+    url(r'^dashboard', include('apps.wish.urls', namespace = 'dashboard')),
+    url(r'^wish_items/', include('apps.wish.urls', namespace = 'wish_items')),
 ]

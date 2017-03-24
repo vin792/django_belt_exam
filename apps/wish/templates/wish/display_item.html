@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<title>{{ item.name.title }}</title>
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row" id="header">
+				<div class="col-sm-6" id="page_head">
+					<h2>{{ item.name.title }}</h2>
+				</div>
+				<div class="col-sm-3 col-sm-offset-3" id="actions">
+					<br>
+					<div class="btn-group">
+  						<a href="{% url 'dashboard:index' %}" class="btn btn-link">Dashboard</a>
+  						<a href="{% url 'login:index' %}" class="btn btn-link">Logout</a>
+					</div>
+				</div>
+			</div>
+			<div class="row" id="content">
+				<div class="col-sm-8" id="users_with_item">
+					<h4>Users who added this item under their wish list:</h4>
+					<ul class="list-group">
+						{% for user in item.wishlists.all%}
+						<li class="list-group-item">{{ user.name.title }}</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

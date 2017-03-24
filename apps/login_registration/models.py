@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 import bcrypt
 import re
+import datetime
 
 from django.db import models
 
 class UserManager(models.Manager):
-	def login(self, email, password):
-		user_confirm = User.objects.filter(email=email)
+	def login(self, username, password):
+		user_confirm = User.objects.filter(username=username)
 		if user_confirm:
 			for user in user_confirm:
 				user_password = user.hash_password
@@ -16,45 +17,40 @@ class UserManager(models.Manager):
 			if bcrypt.hashpw(password, user_password) == user_password:
 				return (True, user_id)
 			else:
-				return (False, "Invalid password")
+				return (False, "Login error: invalid password")
 		else:
-			return (False, "No user with that email")
+			return (False, "Login error: no user with that username")
 
-	def register(self, first_name, last_name, email, password, password_confirm):
+	def register(self, name, username, password, password_confirm, date_hired):
 		errors = []
-		EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
-		NAME_REGEX = re.compile(r'^[a-zA-Z]+$')
-		email_exists = User.objects.filter(email=email)
-		if len(first_name) < 2:
-			errors.append("First name must be more than 2 characters")
-		if not NAME_REGEX.match(first_name):
-			errors.append("First name can only contain letters")
-		if len(last_name) < 2:
-			errors.append("Last name must be more than 2 characters")
-		if not NAME_REGEX.match(last_name):
-			errors.append("Last name can only contain letters")
-		if not EMAIL_REGEX.match(email):
-			errors.append("Not a valid email")
-		if email_exists:
-			errors.append("Email already in use")
+		username_exists = User.objects.filter(username=username)
+		if len(name) < 3:
+			errors.append("Registration error: Name must be 3 or more characters")
+		if len(username) < 3:
+			errors.append("Registration error: Username must be 3 or more characters")
+		if username_exists:
+			errors.append("Registration error: Username already in use")
 		if len(password) < 8:
-			errors.append("Password must be more than 8 characters")
+			errors.append("Registration error: Password must be 8 or more characters")
 		if password != password_confirm:
-			errors.append("Passwords must match")
+			errors.append("Registration error: Passwords must match")
+		if not date_hired:
+			errors.append("Registration error: Must add date hired")
+
 		password = password.encode('utf-8')
 		hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+
 		if errors:
 			return errors
 		else:
-			self.create(first_name=first_name, last_name=last_name, email=email, hash_password=hashed)
-			new_user = User.objects.get(email = email)
+			new_user = self.create(name=name, username=username, date_hired=date_hired, hash_password=hashed)
 			return (True, new_user.id)
 
 class User(models.Model):
-	first_name = models.CharField(max_length = 255)
-	last_name = models.CharField(max_length = 255)
-	email = models.EmailField()
+	name = models.CharField(max_length = 255)
+	username = models.CharField(max_length = 255)
 	hash_password = models.CharField(max_length = 255)
+	date_hired = models.DateTimeField()
 	created_at = models.DateTimeField(auto_now_add = True)
 	updated_at = models.DateTimeField(auto_now = True)
 	objects = UserManager()
